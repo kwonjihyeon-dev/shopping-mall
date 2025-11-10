@@ -18,6 +18,6 @@ export const Filter = () => {
           ${Sort()}
         </div>
       </div>
-    </Search>
+    </div>
   `;
 };
