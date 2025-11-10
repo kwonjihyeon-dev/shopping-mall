@@ -8,6 +8,11 @@ class Router {
   render() {
     const path = location.pathname;
     const root = document.querySelector("#root");
+    const element = this.routes[path]();
+    if (!element) {
+      root.innerHTML = this.routes["/404"]();
+      return;
+    }
     root.innerHTML = this.routes[path]();
   }
 
