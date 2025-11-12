@@ -5,6 +5,9 @@ const enableMocking = () =>
   import("./mocks/browser.js").then(({ worker }) =>
     worker.start({
       onUnhandledRequest: "bypass",
+      serviceWorker: {
+        url: `/front_7th_chapter2-1/mockServiceWorker.js`,
+      },
     }),
   );
 
