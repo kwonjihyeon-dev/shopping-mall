@@ -28,22 +28,18 @@ class Router {
     if (!matchedComponent) return;
 
     if (!replace) history.pushState(null, "", path);
-
+    console.log("matchedComponent", matchedComponent());
     this.render(matchedComponent);
   }
 
   render(matchedComponent) {
-    if (!this.currentComponent) {
-      this.root.innerHTML = "";
-      return;
-    }
-    if (this.currentComponent.unmount) {
+    if (this.currentComponent?.unmount) {
       this.currentComponent.unmount();
     }
 
     this.currentComponent = matchedComponent();
 
-    const element = this.currentComponent.render();
+    const element = this.currentComponent.create();
     this.root.innerHTML = element;
 
     if (typeof this.currentComponent.mount === "function") {

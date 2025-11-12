@@ -1,23 +1,28 @@
-import { ProductItem, ProductListSkeleton } from "@/components/product-list/index.js";
-import { store } from "@/store/store.js";
+import { ProductList } from "@/components/product-list/index.js";
+import { actions, store } from "@/store/store.js";
+import { getCategories, getProducts } from "../api/productApi.js";
+import { Filter } from "../components/filter/index.js";
+import { Layout } from "../components/layout/index.js";
 
-export function ProductListPage(elementId) {
-  let container = document.getElementById(elementId); // products-grid
+export function ProductListPage() {
   let unsubscribe = null;
 
   function create() {
     // TODO: 여기서 elementId설정해줬을 때 router에서 호출하고 dom찾는데 문제 없는 지 체크해야함
     // TODO: createProductListPage + 다른 컴포넌트도 조합되어야함 -> 어떻게할껀지 고민필요
-    return html`<div class="grid grid-cols-2 gap-4 mb-6" id="${elementId}"></div>`;
+    return html`${Layout()}`;
   }
 
-  function render(state) {
+  function render() {
+    const container = document.querySelector("main"); // products-grid
     if (!container) {
-      return (document.innerHTML = "");
+      document.innerHTML = "";
+      return;
     }
 
-    const { products, isLoading } = state;
-    container.innerHTML = `${isLoading ? ProductListSkeleton() : products.map((product) => `${ProductItem(product)}`).join("")} `;
+    // const { products, isFetching } = state;
+    // container.innerHTML = `${isFetching ? ProductListSkeleton() : products.map((product) => `${ProductItem(product)}`).join("")} `;
+    container.innerHTML = `${Filter()}<div class="grid grid-cols-2 gap-4 mb-6" id="products-grid">${ProductList()}</div> `;
   }
 
   // function handleClick(e) {
@@ -39,11 +44,22 @@ export function ProductListPage(elementId) {
   // }
 
   function mount() {
-    if (!container) return;
-
     unsubscribe = store.subscribe((state) => {
       render(state);
     });
+
+    async function fetchProducts() {
+      actions.setIsFetching(true);
+      try {
+        const { products } = await getProducts();
+        actions.setProducts(products);
+      } finally {
+        actions.setIsFetching(false);
+      }
+    }
+
+    getCategories();
+    fetchProducts();
 
     render(store.state);
     // container.addEventListener("click", handleClick);
@@ -52,7 +68,6 @@ export function ProductListPage(elementId) {
   function unmount() {
     if (unsubscribe) unsubscribe();
     // container.removeEventListener("click", handleClick);
-    container = null;
     unsubscribe = null;
   }
 

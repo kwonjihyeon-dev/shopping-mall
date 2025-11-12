@@ -1,3 +1,4 @@
+import { getProducts } from "../api/productApi.js";
 import { Store } from "./core.js";
 
 // 전역 상태 정의
@@ -6,7 +7,14 @@ export const store = new Store({
   products: [],
   cart: [],
   currentPage: "/",
-  isFetching: false,
+  isFetching: true,
+  categories: [],
+  // filters: {
+  //   search: "",
+  //   category1: "",
+  //   category2: "",
+  //   sort: "price_asc",
+  // },
 });
 
 // 액션 함수들 (상태 변경 로직)
@@ -46,8 +54,31 @@ export const actions = {
     store.setState({ currentPage: page });
   },
 
+  // 카테고리 변경
+  setCategories(categories) {
+    store.setState({ categories });
+  },
+
   // 로딩 상태 변경
   setIsFetching(isFetching) {
     store.setState({ isFetching });
+  },
+};
+
+// 디스패치 함수
+export const dispatch = {
+  // product, isFetching 상태 변경
+  async fetchProducts(params) {
+    actions.setIsFetching(true);
+
+    try {
+      const { products } = await getProducts(params);
+      actions.setProducts(products);
+    } catch (error) {
+      console.error("Failed to fetch products", error);
+      throw error;
+    } finally {
+      actions.setIsFetching(false);
+    }
   },
 };

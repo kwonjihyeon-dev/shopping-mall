@@ -11,10 +11,18 @@ export class Store {
 
   // 상태 업데이트
   setState(newState) {
-    // 객체인 경우 병합, 아닌 경우 교체
-    this._state = typeof newState === "object" && !Array.isArray(newState) ? { ...this._state, ...newState } : newState;
+    const prevState = this._state;
+    const nextState =
+      typeof newState === "object" && !Array.isArray(newState) ? { ...prevState, ...newState } : newState;
 
-    // 모든 구독자에게 알림
+    const prevKey = Object.keys(prevState);
+    const nextKey = Object.keys(nextState);
+    // 키를 가져와서 값 비교
+    const isEqual = prevKey.every((key) => Object.is(prevKey[key], nextKey[key]));
+    // 이전 state와 같으면 렌더링 불필요
+    if (isEqual) return;
+
+    this._state = nextState;
     this._notify();
   }
 
