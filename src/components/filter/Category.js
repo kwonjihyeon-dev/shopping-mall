@@ -1,34 +1,32 @@
+import { store } from "@/store/store.js";
+
 export const Category = () => {
-  let isLoading = false;
+  const { categories, isFetching } = store.state;
 
   const category = () => {
-    if (isLoading) {
+    if (isFetching) {
       return html`
         <!-- 1depth 카테고리 -->
         <div class="flex flex-wrap gap-2">
           <div class="text-sm text-gray-500 italic">카테고리 로딩 중...</div>
         </div>
-        <div>하위 카테고리</div>
-        <!-- 2depth 카테고리 -->
       `;
     } else {
       return html`
         <!-- 1depth 카테고리 -->
         <div class="flex flex-wrap gap-2">
-          <button
-            data-category1="생활/건강"
-            class="category1-filter-btn text-left px-3 py-2 text-sm rounded-md border transition-colors
-            bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
-          >
-            생활/건강
-          </button>
-          <button
-            data-category1="디지털/가전"
-            class="category1-filter-btn text-left px-3 py-2 text-sm rounded-md border transition-colors
-            bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
-          >
-            디지털/가전
-          </button>
+          ${Object.keys(categories)
+            .map(
+              (category) => html`
+                <button
+                  data-category1="${category}"
+                  class="category1-filter-btn text-left px-3 py-2 text-sm rounded-md border transition-colors bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                >
+                  ${category}
+                </button>
+              `,
+            )
+            .join("")}
         </div>
         <div>하위 카테고리</div>
         <!-- 2depth 카테고리 -->

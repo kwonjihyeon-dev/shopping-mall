@@ -1,4 +1,4 @@
-import { getProducts } from "../api/productApi.js";
+import { getCategories, getProducts } from "../api/productApi.js";
 import { Store } from "./core.js";
 
 // 전역 상태 정의
@@ -8,7 +8,7 @@ export const store = new Store({
   cart: [],
   currentPage: "/",
   isFetching: true,
-  categories: [],
+  categories: {},
   // filters: {
   //   search: "",
   //   category1: "",
@@ -73,6 +73,9 @@ export const dispatch = {
 
     try {
       const { products } = await getProducts(params);
+      const data = await getCategories(params);
+      console.log("data-->", data);
+      actions.setCategories(data);
       actions.setProducts(products);
     } catch (error) {
       console.error("Failed to fetch products", error);
