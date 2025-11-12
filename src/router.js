@@ -19,7 +19,7 @@ class Router {
   }
 
   match(path) {
-    const BASE_URL = "/front-chapter2-1";
+    const BASE_URL = "/front_7th_chapter2-1";
     const normalized = path.replace(BASE_URL, "/");
     console.log("normalized", normalized);
     return this.routes[normalized] || this.routes["/404"];
