@@ -19,7 +19,7 @@ export function ProductListPage() {
 
     // const { products, isFetching } = state;
     // container.innerHTML = `${isFetching ? ProductListSkeleton() : products.map((product) => `${ProductItem(product)}`).join("")} `;
-    container.innerHTML = `${Filter()}<div class="grid grid-cols-2 gap-4 mb-6" id="products-grid">${ProductList()}</div> `;
+    container.innerHTML = `${Filter()}${ProductList()}`;
   }
 
   // function handleClick(e) {
