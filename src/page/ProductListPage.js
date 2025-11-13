@@ -1,5 +1,6 @@
 import { Filter } from "@/components/filter/index.js";
 import { Layout } from "@/components/layout/index.js";
+import { closeModal, openModal } from "@/components/modal/core.js";
 import { ProductList } from "@/components/product-list/index.js";
 import { actions, dispatch, store } from "@/store/store.js";
 
@@ -61,8 +62,8 @@ export function ProductListPage(router) {
       const { productId } = target.closest(".product-card").dataset;
       console.log(target.nodeName);
       if (target.nodeName === "BUTTON") {
-        console.log("setIsOpen");
-        actions.setIsOpen(true);
+        const target = store.state.products.find((product) => product.productId === productId);
+        openModal(target);
         return;
       }
 
@@ -112,7 +113,8 @@ export function ProductListPage(router) {
     const container = document.querySelector("main");
     container?.removeEventListener("click", handleClick);
     container?.removeEventListener("keydown", handleKeydown);
-    container?.addEventListener("change", handleChange);
+    container?.removeEventListener("change", handleChange);
+    closeModal();
     unsubscribe = null;
   }
 
