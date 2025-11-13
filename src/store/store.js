@@ -1,10 +1,13 @@
-import { getCategories, getProducts } from "../api/productApi.js";
+import { getCategories, getProduct, getProducts } from "../api/productApi.js";
 import { Store } from "./core.js";
 
-// 전역 상태 정의
+/** @typedef {import("../types/product.type.js").ProductDetail} ProductDetail */
+/** @typedef {import("../types/product.type.js").Product} Product */
 
+// 전역 상태 정의
 export const store = new Store({
-  products: [],
+  products: /** @type {Product[]} */ ([]),
+  product: /** @type {ProductDetail} */ ({}),
   cart: [],
   currentPage: "/",
   isFetching: true,
@@ -22,6 +25,11 @@ export const actions = {
   // 상품 목록 설정
   setProducts(products) {
     store.setState({ products });
+  },
+
+  // 상품 상세 설정
+  setProduct(product) {
+    store.setState({ product });
   },
 
   // 카테고리 선택
@@ -83,6 +91,20 @@ export const dispatch = {
       console.log("data-->", data);
       actions.setCategories(data);
       actions.setProducts(products);
+    } catch (error) {
+      console.error("Failed to fetch products", error);
+      throw error;
+    } finally {
+      actions.setIsFetching(false);
+    }
+  },
+  async fetchProduct(productId) {
+    actions.setIsFetching(true);
+
+    try {
+      const response = await getProduct(productId);
+      console.log(response);
+      actions.setProduct(response);
     } catch (error) {
       console.error("Failed to fetch products", error);
       throw error;

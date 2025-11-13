@@ -1,3 +1,4 @@
+export * from "./Breadcrumb.js";
 export * from "./Category.js";
 export * from "./Count.js";
 export * from "./Filter.js";

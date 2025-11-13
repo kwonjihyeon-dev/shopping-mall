@@ -1,12 +1,13 @@
-import { ProductListPage } from "@/page/index.js";
+import { ProductDetailPage, ProductListPage } from "@/page/index.js";
 import Router from "@/router.js";
+import { BASE_URL } from "./constants.js";
 
 const enableMocking = () =>
   import("./mocks/browser.js").then(({ worker }) =>
     worker.start({
       onUnhandledRequest: "bypass",
       serviceWorker: {
-        url: `/front_7th_chapter2-1/mockServiceWorker.js`,
+        url: `${BASE_URL}/mockServiceWorker.js`,
       },
     }),
   );
@@ -1123,8 +1124,9 @@ function createApp() {
   const router = new Router({
     rootId: "root",
     routes: {
-      "/": () => ProductListPage(),
+      "/": () => ProductListPage(router),
       // "/404": () => NotFound(),
+      "/product/:id": () => ProductDetailPage(),
     },
   });
 

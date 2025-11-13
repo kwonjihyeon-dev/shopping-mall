@@ -1,4 +1,5 @@
 import { store } from "@/store/store.js";
+import { Breadcrumb } from "./Breadcrumb";
 
 export const Category = () => {
   const { categories, filters, isFetching } = store.state;
@@ -52,13 +53,7 @@ export const Category = () => {
     <!-- 필터 옵션 -->
     <div class="space-y-2">
       <!-- 브래드크럼 -->
-      <div class="flex items-center gap-2">
-        <label class="text-sm text-gray-600">카테고리:</label>
-        <button data-breadcrumb="reset" class="text-xs hover:text-blue-800 hover:underline">
-          전체 ${filters.category1 ? `&nbsp;&gt; ${filters.category1}` : ""}
-          ${filters.category2 ? `&nbsp;&gt; ${filters.category2}` : ""}
-        </button>
-      </div>
+      ${Breadcrumb()}
       <!-- 필터 카테고리 -->
       ${category()}
     </div>

@@ -8,7 +8,7 @@
  * @returns {string} 상품 카드 element
  */
 export const ProductItem = (product) => {
-  const { title, image, lprice, productId } = product;
+  const { title, image, lprice, maker, brand, productId } = product;
   // 1. 첫 화면 router 로 렌더링될 컴포넌트 호출
   // 2. 컴포넌트 생성하는 함수 호출됨
   // 2-1. mount함수 호출해서 store에 subscribe 등록됨 -> mount 어디서 ?
@@ -35,7 +35,7 @@ export const ProductItem = (product) => {
       <div class="p-3">
         <div class="cursor-pointer product-info mb-3">
           <h3 class="text-sm font-medium text-gray-900 line-clamp-2 mb-1">${title}</h3>
-          <p class="text-xs text-gray-500 mb-2"></p>
+          <p class="text-xs text-gray-500 mb-2">${maker || brand}</p>
           <p class="text-lg font-bold text-gray-900">${lprice}원</p>
         </div>
         <!-- 장바구니 버튼 -->

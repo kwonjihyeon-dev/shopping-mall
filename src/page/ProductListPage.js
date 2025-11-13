@@ -3,7 +3,7 @@ import { Layout } from "@/components/layout/index.js";
 import { ProductList } from "@/components/product-list/index.js";
 import { actions, dispatch, store } from "@/store/store.js";
 
-export function ProductListPage() {
+export function ProductListPage(router) {
   let unsubscribe = null;
 
   function create() {
@@ -38,7 +38,14 @@ export function ProductListPage() {
       actions.setFilters({ category1: "", category2: "" });
     }
 
-    console.log(target.classList.contains("category1-filter-btn"), target.dataset);
+    console.log(target.closest(".product-card"), target.dataset);
+
+    if (target.closest(".product-card")) {
+      const { productId } = target.closest(".product-card").dataset;
+      console.log("productId-->", target.closest(".product-card").dataset);
+      // actions.setFilters({ category1: "", category2: "" });
+      router.push(`/product/${productId}`);
+    }
 
     // if (target.classList.contains("view-detail")) {
     //   // 🔑 스토어 액션을 통해 라우팅

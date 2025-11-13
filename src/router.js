@@ -1,3 +1,5 @@
+import { BASE_URL } from "./constants";
+
 // src/router.js
 class Router {
   constructor({ routes, rootId = "root" }) {
@@ -19,18 +21,22 @@ class Router {
   }
 
   match(path) {
-    const BASE_URL = "/front_7th_chapter2-1";
-    const normalized = path.replace(BASE_URL, "/");
-    console.log("normalized", normalized);
-    return this.routes[normalized] || this.routes["/404"];
-    // 필요하면 /product/:id 같은 패턴 매칭 로직을 추가
+    let exceptBaseUrl = path.replace(BASE_URL, "");
+
+    // /product/:id 패턴 매칭 로직 추가
+    const pathToRegex = /^\/product\/\d+$/;
+    console.log(exceptBaseUrl, pathToRegex.test(exceptBaseUrl));
+    if (pathToRegex.test(exceptBaseUrl)) {
+      exceptBaseUrl = "/product/:id";
+    }
+    return this.routes[exceptBaseUrl] || this.routes["/404"];
   }
 
   push(path, { replace = false } = {}) {
     const matchedComponent = this.match(path);
     if (!matchedComponent) return;
 
-    if (!replace) history.pushState(null, "", path);
+    if (!replace) history.pushState(null, "", `${BASE_URL}${path}`);
     console.log("matchedComponent", matchedComponent());
     this.render(matchedComponent);
   }
