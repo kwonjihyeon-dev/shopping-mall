@@ -9,10 +9,12 @@ class Router {
 
     this.currentComponent = null;
     this.popState = this.popState.bind(this); // 이벤트 대상을 router 객체에 고정
+    this.handleLinkClick = this.handleLinkClick.bind(this);
   }
 
   init() {
     window.addEventListener("popstate", this.popState);
+    document.addEventListener("click", this.handleLinkClick);
     this.push(window.location.pathname, { replace: true });
   }
 
@@ -39,6 +41,16 @@ class Router {
     if (!replace) history.pushState(null, "", `${BASE_URL}${path}`);
     console.log("matchedComponent", matchedComponent());
     this.render(matchedComponent);
+  }
+
+  handleLinkClick(event) {
+    const anchor = event.target.closest("a[data-link]");
+    if (!anchor) return;
+    event.preventDefault();
+
+    const link = anchor.dataset.link || anchor.getAttribute("href") || "/";
+
+    this.push(link.slice(BASE_URL.length) || "/", { replace: false });
   }
 
   render(matchedComponent) {

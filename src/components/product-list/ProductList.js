@@ -1,4 +1,4 @@
-import { ProductItem, ProductListSkeleton, TotalCount } from "@/components/product-list/index.js";
+import { Error, ProductItem, ProductListSkeleton, TotalCount } from "@/components/product-list/index.js";
 import { store } from "@/store/store.js";
 
 export const ProductList = () => {
@@ -13,6 +13,10 @@ export const ProductList = () => {
           .join("")}
       </div>
     `;
+  }
+
+  if (!isFetching && !products.length) {
+    return html` ${Error()} `;
   }
 
   return html`

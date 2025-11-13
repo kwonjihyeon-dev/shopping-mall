@@ -19,6 +19,11 @@ export function ProductListPage(router) {
       return;
     }
 
+    // const success = document.createElement("div");
+    // success.className = "toast fixed bottom-10 left-[50%] translate-x-[-50%] z-[100]";
+    // success.innerHTML = Success();
+    // document.querySelector("#root").appendChild(success);
+
     container.innerHTML = `${Filter()}${ProductList()}`;
     const sentinel = document.createElement("div");
     sentinel.id = "product-list-sentinel";
@@ -84,15 +89,21 @@ export function ProductListPage(router) {
     }
 
     if (breadcrumb) {
-      // actions.setFilters({ category1: "", category2: "" });
-      dispatch.fetchProducts({ category1: "", category2: "", page: 1 });
+      const filter = { category2: "", page: 1 };
+      if (breadcrumb === "category1") {
+        dispatch.fetchProducts(filter);
+        return;
+      }
+      dispatch.fetchProducts({ category1: "", ...filter });
     }
 
-    console.log("breadcrumb-->", target.dataset);
+    if (target.closest("#error-retry-btn")) {
+      dispatch.fetchProducts();
+      return;
+    }
 
     if (target.closest(".product-card")) {
       const { productId } = target.closest(".product-card").dataset;
-      console.log(target.nodeName);
       if (target.nodeName === "BUTTON") {
         const target = store.state.products.find((product) => product.productId === productId);
         openModal(target);
@@ -126,10 +137,6 @@ export function ProductListPage(router) {
     dispatch.fetchProducts({ search: e.target.value, page: 1 });
   };
 
-  const scrollHandler = (e) => {
-    console.log(e);
-  };
-
   function mount() {
     unsubscribe = store.subscribe((state) => {
       render(state);
@@ -142,7 +149,6 @@ export function ProductListPage(router) {
     container?.addEventListener("click", handleClick);
     container?.addEventListener("keydown", handleKeydown);
     container?.addEventListener("change", handleChange);
-    window.addEventListener("scroll", scrollHandler);
   }
 
   function unmount() {
@@ -155,7 +161,6 @@ export function ProductListPage(router) {
     container?.removeEventListener("click", handleClick);
     container?.removeEventListener("keydown", handleKeydown);
     container?.removeEventListener("change", handleChange);
-    window.removeEventListener("scroll", scrollHandler);
     closeModal();
     unsubscribe = null;
   }
