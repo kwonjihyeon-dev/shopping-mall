@@ -3,7 +3,7 @@ import { RelatedProduct } from "./RelatedProduct.js";
 
 export const Product = () => {
   const {
-    product: { title, description, image, lprice, productId, rating, reviewCount, stock, brand, maker },
+    product: { title, description, image, quantity, lprice, productId, rating, reviewCount, stock, brand, maker },
   } = store.state;
 
   return html`
@@ -76,9 +76,9 @@ export const Product = () => {
             <input
               type="number"
               id="quantity-input"
-              value="1"
+              value="${quantity || 1}"
               min="1"
-              max="107"
+              max="${stock}"
               class="w-16 h-8 text-center text-sm border-t border-b border-gray-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
             />
             <button

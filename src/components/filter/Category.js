@@ -22,7 +22,10 @@ export const Category = () => {
                   (category) => html`
                     <button
                       data-category1="${category}"
-                      class="category1-filter-btn text-left px-3 py-2 text-sm rounded-md border transition-colors bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                      class="category1-filter-btn text-left px-3 py-2 text-sm rounded-md border transition-colors bg-white border-gray-300 text-gray-700 hover:bg-gray-50 ${category ===
+                      filters.category1
+                        ? "bg-blue-100 border-blue-300 text-blue-700" // TODO: 컬러 확인 필요
+                        : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"}"
                     >
                       ${category}
                     </button>
@@ -37,7 +40,7 @@ export const Category = () => {
                       class="category2-filter-btn text-left px-3 py-2 text-sm rounded-md border transition-colors ${category ===
                       filters.category2
                         ? "bg-blue-100 border-blue-300 text-blue-700" // TODO: 컬러 확인 필요
-                        : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"} "
+                        : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"}"
                     >
                       ${category}
                     </button>

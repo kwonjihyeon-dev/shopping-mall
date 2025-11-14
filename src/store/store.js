@@ -4,6 +4,14 @@ import { Store } from "./core.js";
 /** @typedef {import("../types/product.type.js").ProductDetail} ProductDetail */
 /** @typedef {import("../types/product.type.js").Product} Product */
 
+const initialFilters = {
+  limit: 20,
+  search: "",
+  category1: "",
+  category2: "",
+  sort: "price_asc",
+};
+
 // 전역 상태 정의
 export const store = new Store({
   products: /** @type {Product[]} */ ([]),
@@ -20,19 +28,23 @@ export const store = new Store({
     total: 340,
     // totalPages: 17,
   },
-  filters: {
-    limit: 20,
-    search: "",
-    category1: "",
-    category2: "",
-    sort: "price_asc",
-  },
+  filters: Object.assign({}, initialFilters),
   // 장바구니
-  isOpen: false,
+  status: "initial",
 });
 
 // 액션 함수들 (상태 변경 로직)
 export const actions = {
+  // 상태 초기화
+  setInitialFilters(filters) {
+    store.setState({ filters });
+  },
+
+  // api 상태
+  setStatus(status) {
+    store.setState({ status });
+  },
+
   // 상품 목록 설정
   setProducts(products) {
     store.setState({ products });
@@ -50,7 +62,20 @@ export const actions = {
 
   // 카테고리 선택
   setFilters(filters) {
-    store.setState({ filters: Object.assign({}, store.state.filters, filters) });
+    const newFilters = Object.assign({}, store.state.filters, filters);
+    const searchParams = new URLSearchParams();
+
+    Object.entries(newFilters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        searchParams.set(key, value);
+      }
+    });
+
+    const queryString = searchParams.toString();
+    const newUrl = queryString ? `${location.pathname}?${queryString}` : location.pathname;
+    window.history.replaceState({}, "", newUrl);
+
+    store.setState({ filters: newFilters });
   },
 
   // 페이지 변경
@@ -119,10 +144,11 @@ export const dispatch = {
       } else {
         actions.setProducts(store.state.products.concat(products));
       }
-
+      actions.setStatus("success");
       actions.setFilters(filters);
       actions.setPagination(pagination);
     } catch (error) {
+      actions.setStatus("error");
       console.error("Failed to fetch products", error);
       throw error;
     } finally {
@@ -134,8 +160,8 @@ export const dispatch = {
 
     try {
       const response = await getProduct(productId);
-      console.log(response);
-      actions.setProduct(response);
+
+      actions.setProduct({ ...response, quantity: 1 });
     } catch (error) {
       console.error("Failed to fetch products", error);
       throw error;

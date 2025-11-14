@@ -12,19 +12,19 @@ export function closeModalOnEscape(event) {
   closeModal();
 }
 
-export function openModal(product) {
-  if (currentModal) {
-    closeModal(); // 이미 모달 할당되있으면 닫고 다시 열기
-  }
-
+export function addToCart(product) {
   const shoppingCart = localStorage.getItem("shopping_cart");
   if (shoppingCart) {
     carts = JSON.parse(shoppingCart);
   }
-  console.log(carts);
+
   const alreadyInCart = carts.find((cart) => cart.productId === product.productId);
   if (alreadyInCart) {
-    alreadyInCart.quantity++;
+    if (product.quantity > 1) {
+      alreadyInCart.quantity = alreadyInCart.quantity + product.quantity;
+    } else {
+      alreadyInCart.quantity++;
+    }
   } else {
     carts.push({ ...product, quantity: 1 });
     const children = document.querySelector("#cart-icon-btn").children;
@@ -40,13 +40,32 @@ export function openModal(product) {
   }
 
   localStorage.setItem("shopping_cart", JSON.stringify(carts));
+}
+
+export function openModal(product) {
+  if (currentModal) {
+    closeModal(); // 이미 모달 할당되있으면 닫고 다시 열기
+  }
+
+  if (product) {
+    addToCart(product);
+  }
+
   currentModal = document.createElement("div");
   currentModal.className = "fixed inset-0 z-50 overflow-y-auto cart-modal";
   currentModal.innerHTML = ModalLayout();
-  currentModal.querySelector("#cart-modal-select-all-checkbox").checked = false;
-  currentModal.querySelectorAll(".cart-item-checkbox").forEach((checkbox) => {
-    checkbox.checked = false;
-  });
+  console.log(currentModal);
+  const AllCheckbox = currentModal.querySelector("#cart-modal-select-all-checkbox");
+  if (AllCheckbox) {
+    AllCheckbox.checked = false;
+  }
+
+  const checkboxes = currentModal.querySelectorAll(".cart-item-checkbox");
+  if (checkboxes) {
+    currentModal.querySelectorAll(".cart-item-checkbox").forEach((checkbox) => {
+      checkbox.checked = false;
+    });
+  }
   currentModal.addEventListener("click", handelClick);
   document.querySelector("#root").appendChild(currentModal);
   document.addEventListener("keydown", closeModalOnEscape);

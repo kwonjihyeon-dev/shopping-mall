@@ -199,17 +199,9 @@ test.describe("E2E: 쇼핑몰 전체 사용자 시나리오 (기본과제)", () 
       await helpers.addProductToCart("PVC 투명 젤리 쇼핑백");
       await expect(page.locator("#cart-icon-btn span")).toHaveText("1");
 
-      // ESC 키로 닫기
-      await page.keyboard.press("Escape");
-      await expect(page.locator(".cart-modal-overlay")).not.toBeVisible();
-
       // 두 번째 상품 추가
       await helpers.addProductToCart("샷시 풍지판");
       await expect(page.locator("#cart-icon-btn span")).toHaveText("2");
-
-      // ESC 키로 닫기
-      await page.keyboard.press("Escape");
-      await expect(page.locator(".cart-modal-overlay")).not.toBeVisible();
 
       // 첫 번째 상품 한 번 더 추가
       await helpers.addProductToCart("PVC 투명 젤리 쇼핑백");

@@ -2,7 +2,7 @@ import { Error, ProductItem, ProductListSkeleton, TotalCount } from "@/component
 import { store } from "@/store/store.js";
 
 export const ProductList = () => {
-  const { products, isFetching } = store.state;
+  const { products, isFetching, status } = store.state;
 
   if (!products.length && isFetching) {
     return html`
@@ -15,7 +15,7 @@ export const ProductList = () => {
     `;
   }
 
-  if (!isFetching && !products.length) {
+  if (!isFetching && status === "error") {
     return html` ${Error()} `;
   }
 

@@ -1,8 +1,9 @@
 import { Filter } from "@/components/filter/index.js";
 import { Layout } from "@/components/layout/index.js";
-import { closeModal, openModal } from "@/components/modal/core.js";
+import { closeModal } from "@/components/modal/core.js";
 import { ProductList } from "@/components/product-list/index.js";
 import { actions, dispatch, store } from "@/store/store.js";
+import { addToCart } from "../components/modal/core";
 import { toast } from "../store/toast";
 
 export function ProductListPage(router) {
@@ -102,15 +103,7 @@ export function ProductListPage(router) {
       const { productId } = target.closest(".product-card").dataset;
       if (target.nodeName === "BUTTON") {
         const target = store.state.products.find((product) => product.productId === productId);
-        openModal(target);
-        const shoppingCart = localStorage.getItem("shopping_cart");
-        let carts = [];
-        if (shoppingCart) {
-          carts = JSON.parse(shoppingCart);
-          carts.push({ ...target, quantity: 1 });
-        } else {
-          carts = [{ ...target, quantity: 1 }];
-        }
+        addToCart(target);
         toast.success("장바구니에 추가되었습니다", { id: "toast-success" });
         return;
       }

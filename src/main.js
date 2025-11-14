@@ -2,6 +2,7 @@ import { NotFoundPage, ProductDetailPage, ProductListPage } from "@/page/index.j
 import Router from "@/router.js";
 import { toastCore } from "./components/toast/core.js";
 import { BASE_URL } from "./constants.js";
+import { actions, store } from "./store/store.js";
 
 const enableMocking = () =>
   import("./mocks/browser.js").then(({ worker }) =>
@@ -1126,11 +1127,16 @@ function createApp() {
     rootId: "root",
     routes: {
       "/": () => ProductListPage(router),
-      "/product/:id": () => ProductDetailPage(),
+      "/product/:id": () => ProductDetailPage(router),
       "/404": () => NotFoundPage(),
     },
   });
 
+  const queryParams = Object.fromEntries(new URLSearchParams(location.search).entries());
+  const filters = store.state.filters;
+  if (Object.keys(queryParams).every((key) => Object.keys(filters).includes(key))) {
+    actions.setInitialFilters(queryParams);
+  }
   router.init();
   toastCore.mount();
 }
