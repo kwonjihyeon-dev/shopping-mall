@@ -90,12 +90,7 @@ export function ProductListPage(router) {
     }
 
     if (breadcrumb) {
-      const filter = { category2: "", page: 1 };
-      if (breadcrumb === "category1") {
-        dispatch.fetchProducts(filter);
-        return;
-      }
-      dispatch.fetchProducts({ category1: "", ...filter });
+      dispatch.fetchProducts({ category1: "", category2: "", page: 1 });
     }
 
     if (target.closest("#error-retry-btn")) {
@@ -108,6 +103,14 @@ export function ProductListPage(router) {
       if (target.nodeName === "BUTTON") {
         const target = store.state.products.find((product) => product.productId === productId);
         openModal(target);
+        const shoppingCart = localStorage.getItem("shopping_cart");
+        let carts = [];
+        if (shoppingCart) {
+          carts = JSON.parse(shoppingCart);
+          carts.push({ ...target, quantity: 1 });
+        } else {
+          carts = [{ ...target, quantity: 1 }];
+        }
         toast.success("장바구니에 추가되었습니다", { id: "toast-success" });
         return;
       }

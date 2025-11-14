@@ -17,6 +17,11 @@ export function openModal(product) {
     closeModal(); // 이미 모달 할당되있으면 닫고 다시 열기
   }
 
+  const shoppingCart = localStorage.getItem("shopping_cart");
+  if (shoppingCart) {
+    carts = JSON.parse(shoppingCart);
+  }
+  console.log(carts);
   const alreadyInCart = carts.find((cart) => cart.productId === product.productId);
   if (alreadyInCart) {
     alreadyInCart.quantity++;
@@ -28,12 +33,13 @@ export function openModal(product) {
     } else {
       const span = document.createElement("span");
       span.className =
-        "absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center";
+        "absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center";
       span.innerHTML = carts.length;
       document.querySelector("#cart-icon-btn").appendChild(span);
     }
   }
 
+  localStorage.setItem("shopping_cart", JSON.stringify(carts));
   currentModal = document.createElement("div");
   currentModal.className = "fixed inset-0 z-50 overflow-y-auto cart-modal";
   currentModal.innerHTML = ModalLayout();
@@ -65,6 +71,7 @@ export function handelClick(event) {
       checkbox.checked = false;
     });
     toast.info("선택된 상품들이 삭제되었습니다", { id: "toast-remove-selected" });
+    localStorage.setItem("shopping_cart", JSON.stringify(carts));
     return;
   }
 
@@ -112,6 +119,7 @@ export function handelClick(event) {
     carts = carts.filter((cart) => cart.productId !== productId);
     selectedItems.delete(productId);
     toast.info("선택된 상품이 삭제되었습니다", { id: "toast-remove-selected" });
+    localStorage.setItem("shopping_cart", JSON.stringify(carts));
   }
 
   if (event.target.closest(".quantity-decrease-btn")) {
@@ -134,6 +142,7 @@ export function handelClick(event) {
     carts = [];
     selectedItems.clear();
     toast.info("장바구니가 비워졌습니다", { id: "toast-clear-cart" });
+    localStorage.removeItem("shopping_cart");
   }
 
   if (carts.length === 0) {

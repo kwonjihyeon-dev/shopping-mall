@@ -6,7 +6,7 @@ export const ProductList = () => {
 
   if (!products.length && isFetching) {
     return html`
-      <div class="grid grid-cols-2 gap-4 mb-6" id="products-grid">
+      <div class="grid grid-cols-2 gap-4 mb-6" data-testid="products-grid" id="products-grid">
         ${Array(6)
           .fill(1)
           .map(() => ProductListSkeleton())
@@ -23,7 +23,7 @@ export const ProductList = () => {
     <!-- 상품 개수 정보 -->
     ${TotalCount()}
     <!-- 상품 목록 -->
-    <div class="grid grid-cols-2 gap-4 mb-6" id="products-grid">
+    <div class="grid grid-cols-2 gap-4 mb-6" data-testid="products-grid" id="products-grid">
       ${products.map((product) => `${ProductItem(product)}`).join("")}
       ${isFetching
         ? Array(2)
