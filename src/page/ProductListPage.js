@@ -1,14 +1,36 @@
 import { Filter } from "@/components/filter/index.js";
 import { Layout } from "@/components/layout/index.js";
-import { closeModal } from "@/components/modal/core.js";
+import { closeModal, openModal } from "@/components/modal/core.js";
 import { ProductList } from "@/components/product-list/index.js";
 import { eventManager } from "@/core/eventManager.js";
+import { addToCart, getCarts, subscribeCart } from "@/store/cart.js";
 import { actions, dispatch, store } from "@/store/store.js";
-import { addToCart, openModal } from "../components/modal/core";
 import { toast } from "../store/toast";
+
+function updateCartIconBadge() {
+  const btn = document.querySelector("#cart-icon-btn");
+  if (!btn) return;
+  const count = getCarts().length;
+  const existing = btn.querySelector("span");
+
+  if (count > 0) {
+    if (existing) {
+      existing.innerHTML = count;
+    } else {
+      const span = document.createElement("span");
+      span.className =
+        "absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center";
+      span.innerHTML = count;
+      btn.appendChild(span);
+    }
+  } else if (existing) {
+    existing.remove();
+  }
+}
 
 export function ProductListPage(router) {
   let unsubscribe = null;
+  let unsubscribeCartBadge = null;
   let observer = null;
 
   function create() {
@@ -157,6 +179,7 @@ export function ProductListPage(router) {
     dispatch.fetchProducts();
     registerEventHandlers();
     document.querySelector("#cart-icon-btn").addEventListener("click", openModalOnCartIconClick);
+    unsubscribeCartBadge = subscribeCart(updateCartIconBadge);
   }
 
   function unmount() {
@@ -168,7 +191,9 @@ export function ProductListPage(router) {
     unregisterEventHandlers();
     closeModal();
     document.querySelector("#cart-icon-btn").removeEventListener("click", openModalOnCartIconClick);
+    if (unsubscribeCartBadge) unsubscribeCartBadge();
     unsubscribe = null;
+    unsubscribeCartBadge = null;
   }
 
   return { create, mount, unmount };

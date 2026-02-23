@@ -1,13 +1,36 @@
 import { Layout } from "@/components/layout/index.js";
+import { openModal } from "@/components/modal/core.js";
 import { DetailProduct } from "@/components/product/index.js";
 import { eventManager } from "@/core/eventManager.js";
+import { addToCart, getCarts, subscribeCart } from "@/store/cart.js";
 import { actions, dispatch, store } from "@/store/store.js";
-import { addToCart, openModal } from "../components/modal/core";
 import { toast } from "../store/toast";
+
+function updateCartIconBadge() {
+  const btn = document.querySelector("#cart-icon-btn");
+  if (!btn) return;
+  const count = getCarts().length;
+  const existing = btn.querySelector("span");
+
+  if (count > 0) {
+    if (existing) {
+      existing.innerHTML = count;
+    } else {
+      const span = document.createElement("span");
+      span.className =
+        "absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center";
+      span.innerHTML = count;
+      btn.appendChild(span);
+    }
+  } else if (existing) {
+    existing.remove();
+  }
+}
 
 // TODO: 여기 클릭이벤트 넣으면서 라우터 props 추가해야함
 export function ProductDetailPage(router) {
   let unsubscribe = null;
+  let unsubscribeCartBadge = null;
 
   function create() {
     return html`${Layout()}`;
@@ -102,13 +125,16 @@ export function ProductDetailPage(router) {
     render(store.state);
     registerEventHandlers();
     document.querySelector("#cart-icon-btn").addEventListener("click", openModalOnCartIconClick);
+    unsubscribeCartBadge = subscribeCart(updateCartIconBadge);
   }
 
   function unmount() {
     if (unsubscribe) unsubscribe();
     unregisterEventHandlers();
     document.querySelector("#cart-icon-btn").removeEventListener("click", openModalOnCartIconClick);
+    if (unsubscribeCartBadge) unsubscribeCartBadge();
     unsubscribe = null;
+    unsubscribeCartBadge = null;
   }
 
   return { create, mount, unmount };

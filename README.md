@@ -112,6 +112,55 @@ class Store {
 
 ---
 
+### 경량 Pub/Sub Store (Cart / Toast)
+
+`store/cart.js`와 `store/toast.js`는 `Store` 클래스를 사용하지 않고, **`Set<listener>` 기반 경량 Pub/Sub 패턴**으로 독립 상태를 관리한다.
+
+두 모듈 모두 동일한 3계층 구조를 따른다.
+
+| 계층          | 역할                                   | 접근                                  |
+| ------------- | -------------------------------------- | ------------------------------------- |
+| 비공개 상태   | 모듈 스코프 변수로 외부 직접 수정 불가 | -                                     |
+| 읽기 (getter) | 현재 상태를 반환                       | `getCarts()`, `getSelectedItems()`    |
+| 변경 함수     | 상태 수정 + `notify()` 호출            | `addToCart()`, `pushToast()` 등       |
+| 구독          | listener 등록, unsubscribe 함수 반환   | `subscribeCart()`, `subscribeToast()` |
+
+**동작 흐름:**
+
+```
+상태 변경 함수 호출 → 내부 상태 수정 → notify() → 등록된 listener 순회 호출 → UI 갱신
+```
+
+#### Cart (`store/cart.js`)
+
+장바구니 아이템(`carts[]`)과 선택 상태(`selectedItems`)를 관리한다.
+모든 변경 함수는 내부에서 `localStorage` 동기화 + `notify()`를 수행하므로, 호출자는 상태 저장이나 UI 갱신을 신경쓸 필요가 없다.
+선택 상태는 영속화하지 않으며, 모달 세션 내에서만 유효하다.
+앱 시작 시 `initCart()`로 localStorage에서 장바구니를 복원한다.
+
+**구독자:**
+
+| 위치                   | 역할                    | 생명주기               |
+| ---------------------- | ----------------------- | ---------------------- |
+| `modal/core.js`        | 모달 리렌더 + 뱃지 갱신 | openModal ~ closeModal |
+| `ProductListPage.js`   | 헤더 뱃지 갱신          | mount ~ unmount        |
+| `ProductDetailPage.js` | 헤더 뱃지 갱신          | mount ~ unmount        |
+
+#### Toast (`store/toast.js`)
+
+알림 메시지 큐(`toasts[]`)를 관리한다.
+토스트는 최대 4개까지 유지되며, 추가 후 3초 뒤 자동으로 제거된다.
+Cart와 달리 localStorage 영속화 없이 휘발성 UI 상태로만 동작한다.
+`notify()` 시 배열의 스냅샷 복사본을 listener에 전달하며, 구독 즉시 현재 상태도 전달한다.
+
+**구독자:**
+
+| 위치                           | 역할                 | 생명주기        |
+| ------------------------------ | -------------------- | --------------- |
+| `toast/core.js` (ToastManager) | 토스트 컨테이너 렌더 | mount ~ unmount |
+
+---
+
 ### 컴포넌트 라이프사이클 (create / mount / unmount)
 
 각 페이지 컴포넌트는 3단계 생명주기를 가집니다.
