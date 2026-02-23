@@ -12,7 +12,9 @@ export const Error = () => {
         </svg>
       </div>
       <p class="text-xl font-medium">오류가 발생했습니다.</p>
-      <button id="error-retry-btn" class="rounded-md bg-blue-500 text-white px-4 py-2">다시 시도</button>
+      <button id="error-retry-btn" data-on-click="retryError" class="rounded-md bg-blue-500 text-white px-4 py-2">
+        다시 시도
+      </button>
     </div>
   `;
 };

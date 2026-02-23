@@ -26,6 +26,7 @@ export const CartFooter = () => {
     <div class="space-y-2">
       <button
         id="cart-modal-remove-selected-btn"
+        data-on-click="removeSelectedCartItems"
         class="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors text-sm"
       >
         선택한 상품 삭제 (${selectedItems.size}개)
@@ -33,6 +34,7 @@ export const CartFooter = () => {
       <div class="flex gap-2">
         <button
           id="cart-modal-clear-cart-btn"
+          data-on-click="clearCart"
           class="flex-1 bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors text-sm"
         >
           전체 비우기

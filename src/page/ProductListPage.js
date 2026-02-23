@@ -2,8 +2,9 @@ import { Filter } from "@/components/filter/index.js";
 import { Layout } from "@/components/layout/index.js";
 import { closeModal } from "@/components/modal/core.js";
 import { ProductList } from "@/components/product-list/index.js";
+import { eventManager } from "@/core/eventManager.js";
 import { actions, dispatch, store } from "@/store/store.js";
-import { addToCart } from "../components/modal/core";
+import { addToCart, openModal } from "../components/modal/core";
 import { toast } from "../store/toast";
 
 export function ProductListPage(router) {
@@ -15,16 +16,12 @@ export function ProductListPage(router) {
   }
 
   function render() {
-    const container = document.querySelector("main"); // products-grid
+    const container = document.querySelector("main");
     if (!container) {
       document.innerHTML = "";
       return;
     }
 
-    // const success = document.createElement("div");
-    // success.className = "toast fixed bottom-10 left-[50%] translate-x-[-50%] z-[100]";
-    // success.innerHTML = Success();
-    // document.querySelector("#root").appendChild(success);
     container.innerHTML = `${Filter()}${ProductList()}`;
 
     const sentinel = document.createElement("div");
@@ -76,66 +73,81 @@ export function ProductListPage(router) {
     observer.observe(sentinel);
   }
 
-  function handleClick(e) {
-    const target = e.target;
-    const { category1, category2, breadcrumb } = target.dataset;
-
-    if (category1) {
-      // actions.setFilters({ category1 });
+  function registerEventHandlers() {
+    // 카테고리
+    eventManager.on("click", "selectCategory1", (_, target) => {
+      const { category1 } = target.dataset;
       dispatch.fetchProducts({ category1, page: 1 });
-    }
+    });
 
-    if (category2) {
-      // actions.setFilters({ category2 });
+    eventManager.on("click", "selectCategory2", (_, target) => {
+      const { category2 } = target.dataset;
       dispatch.fetchProducts({ category2, page: 1 });
-    }
+    });
 
-    if (breadcrumb) {
+    eventManager.on("click", "resetBreadcrumb", () => {
       dispatch.fetchProducts({ category1: "", category2: "", page: 1 });
-    }
+    });
 
-    if (target.closest("#error-retry-btn")) {
+    // 에러 재시도
+    eventManager.on("click", "retryError", () => {
       dispatch.fetchProducts();
-      return;
-    }
+    });
 
-    if (target.closest(".product-card")) {
-      const { productId } = target.closest(".product-card").dataset;
-      if (target.nodeName === "BUTTON") {
-        const target = store.state.products.find((product) => product.productId === productId);
-        addToCart(target);
-        toast.success("장바구니에 추가되었습니다", { id: "toast-success" });
-        return;
-      }
-
+    // 상품 카드 클릭 → 상세 이동
+    eventManager.on("click", "goToProduct", (_, target) => {
+      const { productId } = target.dataset;
       router.push(`/product/${productId}`);
-    }
+    });
+
+    // 상품 카드 내 장바구니 버튼
+    eventManager.on("click", "addToCartFromList", (_, target) => {
+      const { productId } = target.dataset;
+      const product = store.state.products.find((p) => p.productId === productId);
+      addToCart(product);
+      toast.success("장바구니에 추가되었습니다", { id: "toast-success" });
+    });
+
+    // 검색
+    eventManager.on("keydown", "searchProducts", (e) => {
+      if (e.key !== "Enter") return;
+      dispatch.fetchProducts({ search: e.target.value, page: 1 });
+    });
+
+    // 개수 변경
+    eventManager.on("change", "changeLimit", (e) => {
+      const filter = { page: 1, limit: Number(e.target.value) };
+      actions.setFilters(filter);
+      dispatch.fetchProducts(filter);
+    });
+
+    // 정렬 변경
+    eventManager.on("change", "changeSort", (e) => {
+      const filter = { page: 1, sort: e.target.value };
+      actions.setFilters(filter);
+      dispatch.fetchProducts(filter);
+    });
   }
 
-  const handleChange = (e) => {
-    if (!["limit-select", "sort-select"].includes(e.target.id)) return;
-    let filter = { page: 1 };
-    switch (e.target.id) {
-      case "limit-select":
-        filter.limit = Number(e.target.value);
-        break;
-      case "sort-select":
-        filter.sort = e.target.value;
-        break;
-    }
+  function unregisterEventHandlers() {
+    eventManager.off("click", "selectCategory1");
+    eventManager.off("click", "selectCategory2");
+    eventManager.off("click", "resetBreadcrumb");
+    eventManager.off("click", "retryError");
+    eventManager.off("click", "goToProduct");
+    eventManager.off("click", "addToCartFromList");
+    eventManager.off("keydown", "searchProducts");
+    eventManager.off("change", "changeLimit");
+    eventManager.off("change", "changeSort");
+  }
 
-    actions.setFilters(filter);
-    dispatch.fetchProducts(filter);
-  };
-
-  const handleKeydown = (e) => {
-    if (!e.target.matches("#search-input")) return;
-    if (e.key !== "Enter") return;
-    // actions.setFilters({ search: e.target.value });
-    dispatch.fetchProducts({ search: e.target.value, page: 1 });
-  };
+  function openModalOnCartIconClick() {
+    openModal();
+  }
 
   function mount() {
+    eventManager.mount(document.getElementById("root"));
+
     unsubscribe = store.subscribe((state) => {
       render(state);
       update(state);
@@ -143,10 +155,8 @@ export function ProductListPage(router) {
 
     render(store.state);
     dispatch.fetchProducts();
-    const container = document.querySelector("main");
-    container?.addEventListener("click", handleClick);
-    container?.addEventListener("keydown", handleKeydown);
-    container?.addEventListener("change", handleChange);
+    registerEventHandlers();
+    document.querySelector("#cart-icon-btn").addEventListener("click", openModalOnCartIconClick);
   }
 
   function unmount() {
@@ -155,11 +165,9 @@ export function ProductListPage(router) {
       observer.disconnect();
       observer = null;
     }
-    const container = document.querySelector("main");
-    container?.removeEventListener("click", handleClick);
-    container?.removeEventListener("keydown", handleKeydown);
-    container?.removeEventListener("change", handleChange);
+    unregisterEventHandlers();
     closeModal();
+    document.querySelector("#cart-icon-btn").removeEventListener("click", openModalOnCartIconClick);
     unsubscribe = null;
   }
 

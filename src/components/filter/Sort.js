@@ -4,6 +4,7 @@ export const Sort = () => {
       <label class="text-sm text-gray-600">정렬:</label>
       <select
         id="sort-select"
+        data-on-change="changeSort"
         class="text-sm border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
       >
         <option value="price_asc" selected="">가격 낮은순</option>

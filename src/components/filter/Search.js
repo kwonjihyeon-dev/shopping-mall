@@ -11,6 +11,7 @@ export const Search = () => {
         <input
           type="text"
           id="search-input"
+          data-on-keydown="searchProducts"
           placeholder="상품명을 검색해보세요..."
           value="${search}"
           class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"

@@ -19,6 +19,7 @@ export const ProductItem = (product) => {
 
   return html`
     <div
+      data-on-click="goToProduct"
       class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden product-card"
       data-product-id="${productId}"
     >
@@ -40,6 +41,7 @@ export const ProductItem = (product) => {
         </div>
         <!-- 장바구니 버튼 -->
         <button
+          data-on-click="addToCartFromList"
           class="w-full bg-blue-600 text-white text-sm py-2 px-3 rounded-md hover:bg-blue-700 transition-colors add-to-cart-btn"
           data-product-id="${productId}"
         >

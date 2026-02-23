@@ -5,7 +5,10 @@ import { CartFooter } from "./Footer";
 
 export const ModalLayout = () => {
   return html`
-    <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity cart-modal-overlay"></div>
+    <div
+      data-on-click="closeCartModalOverlay"
+      class="fixed inset-0 bg-black bg-opacity-50 transition-opacity cart-modal-overlay"
+    ></div>
     <div class="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4">
       <div
         class="relative bg-white rounded-t-lg sm:rounded-lg shadow-xl w-full max-w-md sm:max-w-lg max-h-[90vh] overflow-hidden"
@@ -24,7 +27,11 @@ export const ModalLayout = () => {
             장바구니
           </h2>
 
-          <button id="cart-modal-close-btn" class="text-gray-400 hover:text-gray-600 p-1">
+          <button
+            id="cart-modal-close-btn"
+            data-on-click="closeCartModal"
+            class="text-gray-400 hover:text-gray-600 p-1"
+          >
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>

@@ -1,5 +1,6 @@
 import { Layout } from "@/components/layout/index.js";
 import { DetailProduct } from "@/components/product/index.js";
+import { eventManager } from "@/core/eventManager.js";
 import { actions, dispatch, store } from "@/store/store.js";
 import { addToCart, openModal } from "../components/modal/core";
 import { toast } from "../store/toast";
@@ -19,74 +20,65 @@ export function ProductDetailPage(router) {
       return;
     }
 
-    // const { products, isFetching } = state;
-    // container.innerHTML = `${isFetching ? ProductListSkeleton() : products.map((product) => `${ProductItem(product)}`).join("")} `;
     container.innerHTML = `${DetailProduct()}`;
   }
 
-  function handleClick(e) {
-    const target = e.target;
-    console.log(target, target.dataset);
-    const { category1, category2 } = target.dataset;
-
-    if (target.closest("a")) {
-      actions.setFilters({ category1: "", category2: "", page: 1 });
-    }
-
-    const input = document.querySelector("#quantity-input");
-    if (target.closest("#add-to-cart-btn")) {
-      addToCart(target);
+  function registerEventHandlers() {
+    eventManager.on("click", "addToCart", (_, target) => {
+      const id = target.dataset.productId;
+      const product = store.state.products.find((product) => product.productId === id);
+      addToCart(product);
       toast.success("장바구니에 추가되었습니다", { id: "toast-success" });
-      return;
-    }
+    });
 
-    if (target.closest(".go-to-product-list")) {
+    eventManager.on("click", "goToProductList", () => {
       const { category1, category2 } = store.state.product;
       actions.setFilters({ category1, category2, page: 1 });
-      router.push(`/`);
-      return;
-    }
+      router.push("/");
+    });
 
-    if (target.closest(".related-product-card")) {
-      const id = target.closest(".related-product-card").dataset.productId;
+    eventManager.on("click", "goToRelatedProduct", (_, target) => {
+      const id = target.dataset.productId;
       router.push(`/product/${id}`);
-      return;
-    }
+    });
 
-    if (category1) {
+    eventManager.on("click", "goToCategory1", (_, target) => {
+      const { category1 } = target.dataset;
       actions.setFilters({ category1, category2: "", page: 1 });
-      router.push(`/`);
-      return;
-    }
+      router.push("/");
+    });
 
-    if (category2) {
+    eventManager.on("click", "goToCategory2", (_, target) => {
+      const { category2 } = target.dataset;
       actions.setFilters({ category2, page: 1 });
-      router.push(`/`);
-      return;
-    }
+      router.push("/");
+    });
 
-    if (target.closest("#quantity-decrease")) {
-      const target = store.state.product;
-      if (target.quantity > 1) {
-        target.quantity--;
-      } else {
-        target.quantity = 1;
-      }
-      input.value = target.quantity;
-      actions.setProduct(target);
-    }
+    eventManager.on("click", "decreaseQty", () => {
+      const product = store.state.product;
+      product.quantity = Math.max(1, product.quantity - 1);
+      const input = document.querySelector("#quantity-input");
+      if (input) input.value = product.quantity;
+      actions.setProduct(product);
+    });
 
-    console.log(input.value, input);
-    if (target.closest("#quantity-increase")) {
-      const target = store.state.product;
-      if (target.quantity >= store.state.product.stock) {
-        target.quantity = store.state.product.stock;
-      } else {
-        target.quantity++;
-      }
-      input.value = target.quantity;
-      actions.setProduct(target);
-    }
+    eventManager.on("click", "increaseQty", () => {
+      const product = store.state.product;
+      product.quantity = Math.min(product.stock, product.quantity + 1);
+      const input = document.querySelector("#quantity-input");
+      if (input) input.value = product.quantity;
+      actions.setProduct(product);
+    });
+  }
+
+  function unregisterEventHandlers() {
+    eventManager.off("click", "addToCart");
+    eventManager.off("click", "goToProductList");
+    eventManager.off("click", "goToRelatedProduct");
+    eventManager.off("click", "goToCategory1");
+    eventManager.off("click", "goToCategory2");
+    eventManager.off("click", "decreaseQty");
+    eventManager.off("click", "increaseQty");
   }
 
   function openModalOnCartIconClick() {
@@ -94,6 +86,8 @@ export function ProductDetailPage(router) {
   }
 
   function mount() {
+    eventManager.mount(document.getElementById("root"));
+
     unsubscribe = store.subscribe((state) => {
       render(state);
     });
@@ -106,15 +100,13 @@ export function ProductDetailPage(router) {
     }
 
     render(store.state);
-    const container = document.querySelector("main");
-    container?.addEventListener("click", handleClick);
+    registerEventHandlers();
     document.querySelector("#cart-icon-btn").addEventListener("click", openModalOnCartIconClick);
   }
 
   function unmount() {
     if (unsubscribe) unsubscribe();
-    const container = document.querySelector("main");
-    container?.removeEventListener("click", handleClick);
+    unregisterEventHandlers();
     document.querySelector("#cart-icon-btn").removeEventListener("click", openModalOnCartIconClick);
     unsubscribe = null;
   }

@@ -24,6 +24,7 @@ export const RelatedProduct = () => {
             .map(
               ({ productId, image, title, lprice }) => html`
                 <div
+                  data-on-click="goToRelatedProduct"
                   class="bg-gray-50 rounded-lg p-3 related-product-card cursor-pointer"
                   data-product-id="${productId}"
                 >

@@ -9,6 +9,7 @@ export const CartItems = () => {
           type="checkbox"
           checked="${selectedItems.size === carts.length ? true : false}"
           id="cart-modal-select-all-checkbox"
+          data-on-click="toggleSelectAll"
           class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-2"
         />
         전체선택 (${carts.length}개)
@@ -29,6 +30,7 @@ export const CartItems = () => {
                   <input
                     type="checkbox"
                     checked="${selectedItems.has(productId) ? true : false}"
+                    data-on-click="toggleCartItemCheck"
                     class="cart-item-checkbox w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     data-product-id="${productId}"
                   />
@@ -54,7 +56,8 @@ export const CartItems = () => {
                   <!-- 수량 조절 -->
                   <div class="flex items-center mt-2">
                     <button
-                      class="quantity-decrease-btn w-7 h-7 flex items-center justify-center 
+                      data-on-click="decreaseCartQty"
+                      class="quantity-decrease-btn w-7 h-7 flex items-center justify-center
                border border-gray-300 rounded-l-md bg-gray-50 hover:bg-gray-100"
                       data-product-id="${productId}"
                     >
@@ -71,7 +74,8 @@ export const CartItems = () => {
                       data-product-id="${productId}"
                     />
                     <button
-                      class="quantity-increase-btn w-7 h-7 flex items-center justify-center 
+                      data-on-click="increaseCartQty"
+                      class="quantity-increase-btn w-7 h-7 flex items-center justify-center
                border border-gray-300 rounded-r-md bg-gray-50 hover:bg-gray-100"
                       data-product-id="${productId}"
                     >
@@ -85,6 +89,7 @@ export const CartItems = () => {
                 <div class="text-right ml-3">
                   <p class="text-sm font-medium text-gray-900">${Number(lprice * quantity).toLocaleString()}원</p>
                   <button
+                    data-on-click="removeCartItem"
                     class="cart-item-remove-btn mt-1 text-xs text-red-600 hover:text-red-800"
                     data-product-id="${productId}"
                   >
