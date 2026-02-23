@@ -1,11 +1,8 @@
+import { getCarts } from "@/store/cart.js";
 import { BASE_URL } from "../../constants";
 
 export function Header() {
-  let count = 0;
-  const shoppingCart = localStorage.getItem("shopping_cart");
-  if (shoppingCart) {
-    count = JSON.parse(shoppingCart).length;
-  }
+  const count = getCarts().length;
   const isDetailPage = location.pathname.includes("/product/");
 
   return html`

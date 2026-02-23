@@ -1,9 +1,10 @@
+import { getCarts } from "@/store/cart.js";
 import { CartItems } from "./CartItems";
-import { carts } from "./core";
 import { EmptyCart } from "./EmptyCart";
 import { CartFooter } from "./Footer";
 
 export const ModalLayout = () => {
+  const carts = getCarts();
   return html`
     <div
       data-on-click="closeCartModalOverlay"

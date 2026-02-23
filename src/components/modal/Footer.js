@@ -1,6 +1,8 @@
-import { carts, selectedItems } from "./core";
+import { getCarts, getSelectedItems } from "@/store/cart.js";
 
 export const CartFooter = () => {
+  const carts = getCarts();
+  const selectedItems = getSelectedItems();
   const selectedItemsInfo = carts.filter((cart) => selectedItems.has(cart.productId));
 
   return html`

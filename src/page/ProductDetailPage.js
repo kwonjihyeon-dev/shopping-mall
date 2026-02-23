@@ -1,13 +1,15 @@
 import { Layout } from "@/components/layout/index.js";
+import { openModal, updateCartIconBadge } from "@/components/modal/core.js";
 import { DetailProduct } from "@/components/product/index.js";
 import { eventManager } from "@/core/eventManager.js";
+import { addToCart, subscribeCart } from "@/store/cart.js";
 import { actions, dispatch, store } from "@/store/store.js";
-import { addToCart, openModal } from "../components/modal/core";
 import { toast } from "../store/toast";
 
 // TODO: 여기 클릭이벤트 넣으면서 라우터 props 추가해야함
 export function ProductDetailPage(router) {
   let unsubscribe = null;
+  let unsubscribeCartBadge = null;
 
   function create() {
     return html`${Layout()}`;
@@ -24,10 +26,8 @@ export function ProductDetailPage(router) {
   }
 
   function registerEventHandlers() {
-    eventManager.on("click", "addToCart", (_, target) => {
-      const id = target.dataset.productId;
-      const product = store.state.products.find((product) => product.productId === id);
-      addToCart(product);
+    eventManager.on("click", "addToCart", () => {
+      addToCart(store.state.product);
       toast.success("장바구니에 추가되었습니다", { id: "toast-success" });
     });
 
@@ -102,13 +102,16 @@ export function ProductDetailPage(router) {
     render(store.state);
     registerEventHandlers();
     document.querySelector("#cart-icon-btn").addEventListener("click", openModalOnCartIconClick);
+    unsubscribeCartBadge = subscribeCart(updateCartIconBadge);
   }
 
   function unmount() {
     if (unsubscribe) unsubscribe();
     unregisterEventHandlers();
     document.querySelector("#cart-icon-btn").removeEventListener("click", openModalOnCartIconClick);
+    if (unsubscribeCartBadge) unsubscribeCartBadge();
     unsubscribe = null;
+    unsubscribeCartBadge = null;
   }
 
   return { create, mount, unmount };

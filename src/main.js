@@ -2,6 +2,7 @@ import { NotFoundPage, ProductDetailPage, ProductListPage } from "@/page/index.j
 import Router from "@/router.js";
 import { toastCore } from "./components/toast/core.js";
 import { BASE_URL } from "./constants.js";
+import { initCart } from "./store/cart.js";
 import { actions, store } from "./store/store.js";
 
 const enableMocking = () =>
@@ -1123,6 +1124,7 @@ window.html = String.raw;
 
 function createApp() {
   main(); // TODO: 삭제필요 -> 컴포넌트분리되면 삭제
+  initCart();
   const router = new Router({
     rootId: "root",
     routes: {

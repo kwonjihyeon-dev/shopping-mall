@@ -1,14 +1,15 @@
 import { Filter } from "@/components/filter/index.js";
 import { Layout } from "@/components/layout/index.js";
-import { closeModal } from "@/components/modal/core.js";
+import { closeModal, openModal, updateCartIconBadge } from "@/components/modal/core.js";
 import { ProductList } from "@/components/product-list/index.js";
 import { eventManager } from "@/core/eventManager.js";
+import { addToCart, subscribeCart } from "@/store/cart.js";
 import { actions, dispatch, store } from "@/store/store.js";
-import { addToCart, openModal } from "../components/modal/core";
 import { toast } from "../store/toast";
 
 export function ProductListPage(router) {
   let unsubscribe = null;
+  let unsubscribeCartBadge = null;
   let observer = null;
 
   function create() {
@@ -157,6 +158,7 @@ export function ProductListPage(router) {
     dispatch.fetchProducts();
     registerEventHandlers();
     document.querySelector("#cart-icon-btn").addEventListener("click", openModalOnCartIconClick);
+    unsubscribeCartBadge = subscribeCart(updateCartIconBadge);
   }
 
   function unmount() {
@@ -168,7 +170,9 @@ export function ProductListPage(router) {
     unregisterEventHandlers();
     closeModal();
     document.querySelector("#cart-icon-btn").removeEventListener("click", openModalOnCartIconClick);
+    if (unsubscribeCartBadge) unsubscribeCartBadge();
     unsubscribe = null;
+    unsubscribeCartBadge = null;
   }
 
   return { create, mount, unmount };

@@ -1,13 +1,15 @@
-import { carts, selectedItems } from "./core";
+import { getCarts, getSelectedItems } from "@/store/cart.js";
 
 export const CartItems = () => {
+  const carts = getCarts();
+  const selectedItems = getSelectedItems();
   return html`
     <!-- 전체 선택 섹션 -->
     <div class="p-4 border-b border-gray-200 bg-gray-50">
       <label class="flex items-center text-sm text-gray-700">
         <input
           type="checkbox"
-          checked="${selectedItems.size === carts.length ? true : false}"
+          ${selectedItems.size === carts.length && carts.length > 0 ? "checked" : ""}
           id="cart-modal-select-all-checkbox"
           data-on-click="toggleSelectAll"
           class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-2"
@@ -29,7 +31,7 @@ export const CartItems = () => {
                 <label class="flex items-center mr-3">
                   <input
                     type="checkbox"
-                    checked="${selectedItems.has(productId) ? true : false}"
+                    ${selectedItems.has(productId) ? "checked" : ""}
                     data-on-click="toggleCartItemCheck"
                     class="cart-item-checkbox w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     data-product-id="${productId}"
