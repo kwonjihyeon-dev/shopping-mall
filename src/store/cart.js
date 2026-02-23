@@ -50,15 +50,13 @@ export function getSelectedItems() {
  * @param {CartItem} product
  */
 export function addToCart(product) {
+  const quantityToAdd = product.quantity || 1;
   const alreadyInCart = carts.find((cart) => cart.productId === product.productId);
+
   if (alreadyInCart) {
-    if (product.quantity > 1) {
-      alreadyInCart.quantity = alreadyInCart.quantity + product.quantity;
-    } else {
-      alreadyInCart.quantity++;
-    }
+    alreadyInCart.quantity += quantityToAdd;
   } else {
-    carts.push({ ...product, quantity: 1 });
+    carts.push({ ...product, quantity: quantityToAdd });
   }
 
   persist();
@@ -126,7 +124,7 @@ export function removeSelected() {
 export function clearCart() {
   carts = [];
   selectedItems.clear();
-  localStorage.removeItem("shopping_cart");
+  persist();
   notify();
 }
 
@@ -134,6 +132,11 @@ export function clearCart() {
 export function initCart() {
   const saved = localStorage.getItem("shopping_cart");
   if (saved) {
-    carts = JSON.parse(saved);
+    try {
+      const parsed = JSON.parse(saved);
+      carts = Array.isArray(parsed) ? parsed : [];
+    } catch {
+      carts = [];
+    }
   }
 }

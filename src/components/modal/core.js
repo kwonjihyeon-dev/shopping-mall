@@ -31,7 +31,7 @@ function rerenderModal() {
 }
 
 /** 헤더의 장바구니 아이콘 뱃지(숫자)를 현재 카트 수량에 맞게 갱신한다 */
-function updateCartIconBadge() {
+export function updateCartIconBadge() {
   const btn = document.querySelector("#cart-icon-btn");
   if (!btn) return;
   const count = getCarts().length;
